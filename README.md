@@ -15,7 +15,7 @@ The ESP32 is flashed with the firmware.
 The ESP32 is now building a W-Lan access point with which we connect. The current password is: `password`
 
 After that we have to navigate to the Wifimanager Config page with a browser.
-The IP is: `192.168.4.2`
+The IP is: `192.168.4.1`
 
 There you enter your W-Lan registration data.
 
