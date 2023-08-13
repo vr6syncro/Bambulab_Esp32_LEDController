@@ -240,12 +240,12 @@ String getStartPage() {
     </div>
     <div>
         <h5>Printables</h5>
-        <a href="https://www.printables.com/de/model/501355-bambulab-status-indicator-table-stand" target="_blank">3D Models</a>
+        <a href="https://www.printables.com/de/model/501355-bambulab-esp32-ledcontroller" target="_blank">3D Models</a>
     </div>
   </div>
   <div class="container">
   <div class='info-box'>
-    <img src="https://github.com/vr6syncro/Bambulab_Esp32_LEDController/blob/main/ak_rund.png?raw=true" alt="vr6syncro">
+    <img src="https://github.com/vr6syncro/vr6syncro/blob/main/img/ak_rund.png?raw=true" alt="vr6syncro">
   </div>
 </div>
 <div class="container">
