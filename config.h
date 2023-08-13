@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-const char* firmwareVersion = "V1.3";
+const char* firmwareVersion = "V1.4";
 
 int szenario = 1;
 bool updateAvailable = false;
