@@ -15,13 +15,12 @@ void ledControlIconFastLED() {
     Serial.println("Entering Icon Led Handler");
   }
   */
-
   if (f_layerInspection && hmsErrorExists) {
     leds[0] = CRGB::Green;
     leds[1] = CRGB::Blue;
     leds[2] = CRGB::Green;
     leds[4] = CRGB::Blue;
-  } else if (hmsErrorExists) {
+  } else if (!f_layerInspection && hmsErrorExists) {
     leds[5] = CRGB::Red;
   } else {
     leds[5] = CRGB::White;

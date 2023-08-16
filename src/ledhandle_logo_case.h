@@ -15,10 +15,9 @@ void ledControlLogoFastLED() {
     Serial.println("Entering Logo Led Handler");
   }
   */
-
   if (f_layerInspection && hmsErrorExists) {
     fill_solid(leds, NUM_LEDS, CRGB::Blue);
-  } else if (hmsErrorExists) {
+  } else if (!f_layerInspection && hmsErrorExists) {
     fill_solid(leds, NUM_LEDS, CRGB::Red);
   } else {
   }
