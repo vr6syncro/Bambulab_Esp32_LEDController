@@ -557,6 +557,27 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     if (printObject.containsKey("bed_temper")) {
       bedTemperature = printObject["bed_temper"].as<int>();
     }
+
+    if (printObject.containsKey("aux_part_fan")) {
+        aux_part_fan = printObject["aux_part_fan"].as<bool>();
+    }
+
+    if (printObject.containsKey("gcode_file")) {
+        gcode_file = printObject["gcode_file"].as<String>();
+    }
+
+    if (printObject.containsKey("total_layer_num")) {
+        total_layer_num = printObject["total_layer_num"].as<int>();
+    }
+
+    if (printObject.containsKey("layer_num")) {
+        layer_num = printObject["layer_num"].as<int>();
+    }
+
+
+    if (printObject.containsKey("subtask_name")) {
+        subtask_name = printObject["subtask_name"].as<String>();
+    }
   }
 
   if (received_sequence_id > sequence_id) {
@@ -593,6 +614,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   webData["nozzleTemperature"] = nozzleTemperature;
   webData["bedTargetTemperature"] = bedTargetTemperature;
   webData["bedTemperature"] = bedTemperature;
+  webData["aux_part_fan"] = aux_part_fan;
+  webData["gcode_file"] = gcode_file;
+  webData["total_layer_num"] = total_layer_num;
+  webData["subtask_name"] = subtask_name;
+  webData["layer_num"] = layer_num;
 
   JsonArray fullCodesArray = webData.createNestedArray("full_codes");
   JsonArray urlsArray = webData.createNestedArray("urls");
