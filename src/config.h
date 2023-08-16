@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+//TODO Version extern verfügbar machen für Github Actions?
 const char* firmwareVersion = "V1.3";
 
 int szenario = 1;

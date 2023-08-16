@@ -14,10 +14,12 @@ void initFastLED() {
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);  // should prevent the 5V Led Strip from drawing more than 500mA current to protect the USB port.
 }
 
-//function to change led max brightness, atm not used
 void setFastLEDBrightness(int new_brightness) {
   brightness = new_brightness;
   FastLED.setBrightness(brightness);
+    preferences.begin("mqtt_config", false);
+    preferences.putInt("brightness", brightness);
+    preferences.end();
 }
 
 

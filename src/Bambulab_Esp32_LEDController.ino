@@ -451,6 +451,7 @@ void loadPreferences() {
   debug = preferences.getBool("debug");                        // Laden des Debug-Status
   String szenario_string = preferences.getString("szenario");  // Default to "icon"
   szenario = szenario_string.toInt();
+  brightness = preferences.getInt("brightness", 84);
   preferences.end();
 }
 
@@ -464,6 +465,7 @@ void savePreferences(WiFiManagerParameter& server, WiFiManagerParameter& port, W
   preferences.putString("serial", serial.getValue());
   preferences.putBool("debug", debug);
   preferences.putString("szenario", szenario_param.getValue());
+  preferences.putInt("brightness", brightness);
   preferences.end();
 }
 
@@ -877,7 +879,18 @@ void handleSerialCommands() {
       sendLedControlCommand("work_light", command.substring(11).c_str(), 500, 500, 1, 1000);
     } else if (command.startsWith("print_speed ")) {
       sendPrintCommand("print_speed", command.substring(12).c_str());
-    } else {
+    } 
+    // Hinzugefügt: Helligkeit über die serielle Konsole ändern
+    else if (command.startsWith("brightness ")) {
+      int new_brightness = command.substring(15).toInt();
+      if (new_brightness >= 0 && new_brightness <= 255) {
+          setFastLEDBrightness(new_brightness);
+          Serial.println("Brightness set to: " + String(brightness));
+      } else {
+          Serial.println("Invalid brightness value. Must be between 0 and 255.");
+      }
+    }
+    else {
       Serial.println("Unrecognized command: " + command);
     }
   }
