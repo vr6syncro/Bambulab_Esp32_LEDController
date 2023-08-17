@@ -24,7 +24,7 @@ jobs:
         pip install platformio
 
     - name: Extract Board Names
-      run: python .github/workflows/extract_boards.py
+      run: python extract_boards.py
       id: extract_boards
       continue-on-error: false
 
