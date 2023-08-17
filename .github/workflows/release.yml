@@ -27,6 +27,10 @@ jobs:
       run: |
         python extract_boards.py > boards.txt
 
+    - name: Extract Tag Name
+      id: get_tag
+      run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
     - name: Install GitHub CLI
       run: |
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
@@ -41,7 +45,7 @@ jobs:
       run: |
         while IFS= read -r board; do
           pio run -e $board
-          mv .pio/build/$board/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${board}_${{ github.ref#refs/tags/ }}.bin
+          mv .pio/build/$board/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
         done < boards.txt
 
     - name: List renamed .bin files
@@ -62,7 +66,7 @@ jobs:
     - name: Attach .bin files to Release
       run: |
         while IFS= read -r board; do
-          file=.pio/build/Bambulab_Esp32_LEDController_${board}_${{ github.ref#refs/tags/ }}.bin
+          file=.pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
           echo "Uploading $file to release..."
           if ! gh release upload ${{ github.ref }} $file; then
             echo "Failed to upload $file"
