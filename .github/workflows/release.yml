@@ -68,7 +68,7 @@ jobs:
         while IFS= read -r board; do
           file=.pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
           echo "Uploading $file to release..."
-          if ! gh release upload ${{ github.ref }} $file; then
+          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $file; then
             echo "Failed to upload $file"
           fi
         done < boards.txt
