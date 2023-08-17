@@ -12,8 +12,8 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-  
-    - name: List directory contents
+
+    - name: List root directory contents
       run: ls -l
 
     - name: Set up Python
@@ -37,8 +37,6 @@ jobs:
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
         sudo apt update
         sudo apt install gh
-    
-    
 
     - name: Authenticate with GitHub CLI
       run: echo ${{ secrets.GH_PAT }} | gh auth login --with-token
@@ -49,6 +47,9 @@ jobs:
           pio run -e $board
           mv .build/$board/firmware.bin .build/firmware-$board-${{ github.ref }}.bin
         done
+
+    - name: List .build directory contents
+      run: ls -l .build/
 
     - name: Create Release
       id: create_release
@@ -67,5 +68,7 @@ jobs:
         for board in ${{ steps.extract_boards.outputs.stdout }}; do
           file=.build/firmware-$board-${{ github.ref }}.bin
           echo "Uploading $file to release..."
-          gh release upload ${{ github.ref }} $file
+          if ! gh release upload ${{ github.ref }} $file; then
+            echo "Failed to upload $file"
+          fi
         done
