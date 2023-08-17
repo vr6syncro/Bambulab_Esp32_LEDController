@@ -1,11 +1,11 @@
 #include "welcome.h"
 #include "config.h"
+#include <Preferences.h>
 #include "ws2812b.h"
 #include "ledhandle.h"
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <WiFiManager.h>
-#include <Preferences.h>
 #include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
@@ -619,6 +619,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   webData["total_layer_num"] = total_layer_num;
   webData["subtask_name"] = subtask_name;
   webData["layer_num"] = layer_num;
+  webData["gcodeState"] = gcodeState;
+
 
   JsonArray fullCodesArray = webData.createNestedArray("full_codes");
   JsonArray urlsArray = webData.createNestedArray("urls");
