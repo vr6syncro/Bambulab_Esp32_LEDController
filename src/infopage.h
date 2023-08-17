@@ -51,18 +51,33 @@ String getInfoPage() {
     #mqttConfigForm button:hover {
         background-color: #555;
     }
-    .info-box {
-        border-radius: 10px;
-        background-color: #E5E4E2;
-        padding: 20px;
-        margin: 20px auto;
-        max-width: 800px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
+.info-box {
+    border-radius: 10px;
+    background-color: #E5E4E2;
+    padding: 10px;
+    margin: 10px auto;
+    max-width: 1000px;
+    max-height: 70vh;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+    .container {
+    max-width: 90vw;
+    max-height: 90vh; 
+    margin: 0 auto;
+    justify-content: flex-start;
+}
+
+.progress-bar-container {
+    width: 100%;
+    padding: 0 10px;  /* Abstand links und rechts */
+    margin-bottom: 15px; /* Abstand von der Progressbar zum nächsten Element */
+}
+
     .info-box div a {
         display: block;
         text-align: center !important;
@@ -99,9 +114,6 @@ String getInfoPage() {
         display: flex;
         flex-direction: column;
         padding-top: 20px;
-    }
-    .container {
-        flex: 1;
     }
     footer {
         position: fixed;
@@ -355,6 +367,34 @@ if(data.hasOwnProperty('heatbreakFanSpeed')) {
     fanSpeedPercentage = roundToNextTen(fanSpeedPercentage);
     document.getElementById('heatbreakFanSpeed').value = fanSpeedPercentage + '%';
 }
+
+if (data.hasOwnProperty('subtask_name')) {
+    if (data.subtask_name.trim() === "") {
+        document.getElementById('subtaskName').value = "waiting for print";
+    } else {
+        document.getElementById('subtaskName').value = data.subtask_name;
+    }
+}
+
+if(data.hasOwnProperty('gcodeState')) {
+    document.getElementById('gcodeStateID').value = data.gcodeState;
+}
+
+if (data.hasOwnProperty('layer_num') && data.hasOwnProperty('total_layer_num')) {
+    let progressPercentage = (data.layer_num / data.total_layer_num) * 100;
+    
+    // Überprüfen, ob der Fortschrittsprozentsatz NaN ist
+    if (isNaN(progressPercentage)) {
+        document.getElementById('printProgress').style.display = "none";
+        document.getElementById('progressPercentage').style.display = "none";
+    } else {
+        document.getElementById('printProgress').style.width = progressPercentage + "%";
+        document.getElementById('progressPercentage').innerText = progressPercentage.toFixed(2) + "%";
+        document.getElementById('printProgress').style.display = "block";
+        document.getElementById('progressPercentage').style.display = "block";
+    }
+}
+
 // Aktualisieren von hmsErrorExists, full_codes und urls
 var hmsText = document.getElementById('hmsErrorExistsID');
 var fullCodesContainer = document.getElementById('fullCodesContainer');
@@ -445,54 +485,69 @@ if (data.hasOwnProperty('full_codes') && data.hasOwnProperty('urls')) {
   </div>
 </nav>
 <div class='container'>
-    
-    <!-- Row for HMS Error and Fan Speeds -->
     <div class='row'>
-        <!-- HMS Error Info Box (Left) -->
-<div class='col s6'>
-    <div class='info-box' id='hmsErrorBox'>
-        <h5>HMS Error Info</h5>
-        <div class='center-align'>
-            <p id='hmsErrorExistsID'>No HMS Error</p>
-            <div id='fullCodesContainer'>
-                <ul id='fullCodesList'></ul>
+
+        <!-- Printer Info Box (Left) -->
+        <div class='col s6'>
+            <div class='info-box'>
+
+                <!-- Print Progress -->
+                <div class="progress-bar-container">
+                    <div class='progress'>
+                        <div class='determinate' id='printProgress' style='width: 0%'></div>
+                    </div>
+                    <p class='center-align' id="progressPercentage">0.00%</p>
+                </div>
+
+                <div class="info-content">
+                    <p class='center-align'><strong>File Name</strong></p>
+                    <div class='input-field'>
+                     <input id='subtaskName' type='text' value="Loading..." readonly>
+                    </div>
+                    <p class='center-align'><strong>Status</strong></p>
+                    <div class='input-field'>
+                        <input id='gcodeStateID' type='text' value="Loading..." readonly>
+                        </div>
+                    <p class='center-align'><strong>HMS Error Info</strong></p>
+                    <p class='center-align' id='hmsErrorExistsID'>No HMS Error</p>
+                    <div class='center-align' id='fullCodesContainer'>
+                        <ul id='fullCodesList'></ul>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Fan Speeds Info Box (Right) -->
         <div class='col s6'>
             <div class='info-box'>
-                <h5>Fan Speeds Info</h5>
                 <div class="info-content">
                     <p class='center-align'>Aux Fan Speed</p>
                     <div class='input-field'>
-                     <input id='bigFan1Speed' type='text' readonly>
+                     <input id='bigFan1Speed' type='text' value="Loading..." readonly>
                     </div>
                     <p class='center-align'>Part Cooling Fan Speed</p>
                     <div class='input-field'>
-                     <input id='coolingFanSpeed' type='text' readonly>
+                     <input id='coolingFanSpeed' type='text' value="Loading..." readonly>
                     </div>
                     <p class='center-align'>Chamber Fan Speed</p>
                     <div class='input-field'>
-                     <input id='bigFan2Speed' type='text' readonly>
+                     <input id='bigFan2Speed' type='text' value="Loading..." readonly>
                     </div>
                     <p class='center-align'>Heatbreak Fan Speed</p>
                     <div class='input-field'>
-                     <input id='heatbreakFanSpeed' type='text' readonly>
+                     <input id='heatbreakFanSpeed' type='text' value="Loading..." readonly>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
+    
     <!-- Row for Nozzle and Bed Temperatures -->
     <div class='row'>
         <!-- Nozzle Temperature Info Box (Left) -->
         <div class='col s6'>
             <div class='info-box'>
-                <h5>Nozzle Temperature Info</h5>
                 <div class="info-content">
                     <p class='center-align'>Nozzle Target Temperature</p>
                     <div class='input-field'>
@@ -511,7 +566,6 @@ if (data.hasOwnProperty('full_codes') && data.hasOwnProperty('urls')) {
         <!-- Bed Temperature Info Box (Right) -->
         <div class='col s6'>
             <div class='info-box'>
-                <h5>Bed Temperature Info</h5>
                 <div class="info-content">
                     <p class='center-align'>Bed Target Temperature</p>
                     <div class='input-field'>
