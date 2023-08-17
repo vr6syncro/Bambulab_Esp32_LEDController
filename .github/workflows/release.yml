@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.x'
 
@@ -24,7 +24,7 @@ jobs:
         pip install platformio
 
     - name: Extract Board Names
-      run: python extract_boards.py
+      run: python .github/workflows/extract_boards.py
       id: extract_boards
       continue-on-error: false
 
