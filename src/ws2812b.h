@@ -3,6 +3,8 @@
 
 #include <FastLED.h>
 
+extern Preferences preferences;
+
 #define DATA_PIN 16
 #define NUM_LEDS 6
 CRGB leds[NUM_LEDS];
