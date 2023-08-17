@@ -18,6 +18,12 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: platformio-${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
+
     - name: Install PlatformIO
       run: |
         python -m pip install --upgrade pip
