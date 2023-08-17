@@ -910,7 +910,7 @@ void handleSerialCommands() {
     } 
     // Hinzugefügt: Helligkeit über die serielle Konsole ändern
     else if (command.startsWith("brightness ")) {
-      int new_brightness = command.substring(15).toInt();
+      int new_brightness = command.substring(11).toInt();
       if (new_brightness >= 0 && new_brightness <= 255) {
           setFastLEDBrightness(new_brightness);
           Serial.println("Brightness set to: " + String(brightness));
