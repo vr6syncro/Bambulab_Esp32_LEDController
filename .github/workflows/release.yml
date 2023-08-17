@@ -48,6 +48,24 @@ jobs:
           mv .pio/build/$board/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
         done < boards.txt
 
+    - name: Organize files into folders and push to repository
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "actions@github.com"
+
+        while IFS= read -r board; do
+          mkdir -p binaries/$board
+          
+          mv .pio/build/$board/firmware.bin binaries/$board/
+          mv .pio/build/$board/bootloader.bin binaries/$board/
+          mv .pio/build/$board/partitions.bin binaries/$board/
+          
+          git add binaries/$board/*
+        done < boards.txt
+
+        git commit -m "Add binaries for boards"
+        git push
+
     - name: List renamed .bin files
       run: ls -l .pio/build/
 
