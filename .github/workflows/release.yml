@@ -33,10 +33,11 @@ jobs:
 
     - name: Install GitHub CLI
       run: |
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-        sudo apt-add-repository https://cli.github.com/packages
+        sudo apt install -y software-properties-common
+        sudo apt-add-repository -y ppa:github/git-lfs
         sudo apt update
-        sudo apt install gh
+        sudo apt install -y gh
+    
 
     - name: Authenticate with GitHub CLI
       run: echo ${{ secrets.GH_PAT }} | gh auth login --with-token
