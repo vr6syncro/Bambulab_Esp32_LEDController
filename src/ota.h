@@ -39,13 +39,41 @@ void setupOTA() {
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
       } else {
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK, restarting now!");
+        String htmlResponse = R"(
+          <html>
+            <body onload="showModalAndCheckESP();">
+              <div id="myModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; text-align: center;">
+                  The Bambulab Esp32 LEDController is restarting. Please wait...
+                </div>
+              </div>
+              <script>
+                function showModalAndCheckESP() {
+                  document.getElementById("myModal").style.display = "block";
+                  setInterval(function() {
+                    fetch('/')
+                      .then(response => {
+                        if (response.ok) {
+                          window.location.replace("/");
+                        }
+                      })
+                      .catch(error => {
+                        console.log('Bambulab Esp32 LEDController is not yet available:', error);
+                      });
+                  }, 1000);
+                }
+              </script>
+            </body>
+          </html>
+        )";
+        
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/html", htmlResponse);
         response->addHeader("Connection", "close");
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
 
-        delay(1000);    // Warte kurz, bevor du den ESP32 neu startest
-        ESP.restart();  // Starte den ESP32 neu
+        delay(2000);  // Wait for 3 seconds before restarting the ESP32
+        ESP.restart();
       }
     },
     [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
@@ -68,12 +96,9 @@ void setupOTA() {
       }
     });
 
-  // Umleitung von /update (GET-Request) zur Hauptseite
   server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/");
   });
 }
-
-
 
 #endif
