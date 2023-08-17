@@ -41,8 +41,9 @@ jobs:
       run: |
         while IFS= read -r board; do
           pio run -e $board
-          mv .pio/build/$board/firmware.bin Bambulab_Esp32_LEDController_${board}_${{ github.ref }}.bin
+          mv .pio/build/$board/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${board}_${{ github.ref#refs/tags/ }}.bin
         done < boards.txt
+    
 
     - name: List renamed .bin files
       run: ls -l
