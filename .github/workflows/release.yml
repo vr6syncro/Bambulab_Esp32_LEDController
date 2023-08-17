@@ -41,7 +41,7 @@ jobs:
       run: |
         while IFS= read -r board; do
           pio run -e $board
-          mv .pio/build/$board/firmware.bin Bambulab_Esp32_LEDController_$board_${{ github.ref }}.bin
+          mv .pio/build/$board/firmware.bin Bambulab_Esp32_LEDController_${board}_${{ github.ref }}.bin
         done < boards.txt
 
     - name: List renamed .bin files
@@ -62,7 +62,7 @@ jobs:
     - name: Attach .bin files to Release
       run: |
         while IFS= read -r board; do
-          file=Bambulab_Esp32_LEDController_$board_${{ github.ref }}.bin
+        file=Bambulab_Esp32_LEDController_${board}_${{ github.ref }}.bin
           echo "Uploading $file to release..."
           if ! gh release upload ${{ github.ref }} $file; then
             echo "Failed to upload $file"
