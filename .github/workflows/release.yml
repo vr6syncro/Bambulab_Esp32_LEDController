@@ -30,6 +30,10 @@ jobs:
     - id: set-matrix
       run: echo "::set-output name=matrix::$(jq -R -s -c 'split("\n")[:-1]' boards.txt)"
 
+    - name: Find pio path
+      run: which pio || echo "pio not found"
+      id: find-pio
+
   build:
     needs: prepare
     runs-on: ubuntu-latest
@@ -54,7 +58,7 @@ jobs:
 
     - name: Build for ${{ matrix.board }}
       run: |
-       ~/.local/bin/pio run -e ${{ matrix.board }}
+       ${{ steps.find-pio.outputs.stdout }} run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
           mv .pio/build/${{ matrix.board }}/firmware.bin binaries/${{ matrix.board }}/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
