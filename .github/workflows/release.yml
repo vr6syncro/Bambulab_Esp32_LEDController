@@ -27,6 +27,13 @@ jobs:
     - name: Determine PIO path
       run: echo "PIO_PATH=$(which pio)" >> $GITHUB_ENV
 
+    - name: Debug: Print PIO path
+      run: |
+        echo "Using PIO at: $PIO_PATH"
+        which pio
+        echo "PlatformIO version:"
+        pio --version
+
     - name: Extract Board Names
       run: python extract_boards.py > boards.txt
 
@@ -57,6 +64,9 @@ jobs:
     - name: Echo PIO_PATH
       run: echo $PIO_PATH
 
+    - name: Debug: Print current directory
+      run: ls -al
+
     - name: Build for ${{ matrix.board }}
       run: |
         ${{ env.PIO_PATH }} run -e ${{ matrix.board }}
@@ -69,6 +79,9 @@ jobs:
           echo "firmware.bin for ${{ matrix.board }} not found!"
           exit 1
         fi
+
+    - name: Debug: Check binaries directory
+      run: ls -al binaries/${{ matrix.board }}
 
     - name: Push binaries to repository
       run: |
