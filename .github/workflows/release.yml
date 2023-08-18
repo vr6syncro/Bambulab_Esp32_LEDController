@@ -6,10 +6,9 @@ on:
       - 'V*.*'
 
 jobs:
-  prepare:
+  build:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -19,38 +18,49 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install PlatformIO and dependencies
+    - name: Install PlatformIO
       run: |
         python -m pip install --upgrade pip
         pip install platformio
 
+    - name: Cache PlatformIO
+      uses: actions/cache@v3
+      with:
+        path: .pio
+        key: ${{ runner.os }}-pio-${{ hashFiles('platformio.ini') }}
+        restore-keys: |
+          ${{ runner.os }}-pio-
+
     - name: Extract Board Names
-      run: python extract_boards.py > boards.txt
-
-    - id: set-matrix
-      run: echo "::set-output name=matrix::$(jq -R -s -c 'split("\n")[:-1]' boards.txt)"
-
-  build:
-    needs: prepare
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        board: ${{fromJson(needs.prepare.outputs.matrix)}}
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v3
+      run: |
+        python extract_boards.py > boards.txt
 
     - name: Extract Tag Name
       id: get_tag
       run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
 
-    - name: Build for ${{ matrix.board }}
+    - name: Install GitHub CLI
       run: |
-        pio run -e ${{ matrix.board }}
-        mv .pio/build/${{ matrix.board }}/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt update
+        sudo apt install gh
 
-    - name: List renamed .bin files
-      run: ls -l .pio/build/
+    - name: Authenticate with GitHub CLI
+      run: echo ${{ secrets.GH_PAT }} | gh auth login --with-token
+
+    - name: Build Firmware and Move .bin files
+      run: |
+        while IFS= read -r board; do
+          pio run -e $board
+          mkdir -p binaries/$board
+          mv .pio/build/$board/firmware.bin binaries/$board/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
+          mv .pio/build/$board/bootloader.bin binaries/$board/bootloader.bin
+          mv .pio/build/$board/partitions.bin binaries/$board/partitions.bin
+        done < boards.txt
+
+    - name: List files in binaries directory
+      run: find binaries -type f
 
     - name: Create Release
       id: create_release
@@ -64,10 +74,25 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-    - name: Attach .bin file to Release
+    - name: Attach .bin files to Release
       run: |
-        file=.pio/build/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
-        echo "Uploading $file to release..."
-        if ! gh release upload ${{ steps.get_tag.outputs.tag }} $file; then
-          echo "Failed to upload $file"
-        fi
+        while IFS= read -r board; do
+          firmware_file=binaries/$board/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
+          bootloader_file=binaries/$board/bootloader.bin
+          partitions_file=binaries/$board/partitions.bin
+          
+          echo "Uploading $firmware_file to release..."
+          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $firmware_file; then
+            echo "Failed to upload $firmware_file"
+          fi
+
+          echo "Uploading $bootloader_file to release..."
+          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $bootloader_file; then
+            echo "Failed to upload $bootloader_file"
+          fi
+
+          echo "Uploading $partitions_file to release..."
+          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $partitions_file; then
+            echo "Failed to upload $partitions_file"
+          fi
+        done < boards.txt
