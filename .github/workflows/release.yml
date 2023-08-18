@@ -62,6 +62,14 @@ jobs:
     - name: List files in binaries directory
       run: find binaries -type f
 
+    - name: Commit and Push binaries to repository
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "actions@github.com"
+        git add binaries/
+        git commit -m "Add binaries for release ${{ steps.get_tag.outputs.tag }}"
+        git push
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
