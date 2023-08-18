@@ -66,7 +66,7 @@ jobs:
       run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
-        git add binaries/
+        git add -f binaries/
         git commit -m "Add binaries for release ${{ steps.get_tag.outputs.tag }}"
         git push
 
