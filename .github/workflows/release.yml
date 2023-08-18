@@ -58,6 +58,7 @@ jobs:
 
     - name: Build for ${{ matrix.board }}
       run: |
+        echo $PIO_PATH
         ${{ env.PIO_PATH }} run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
