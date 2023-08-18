@@ -30,8 +30,8 @@ jobs:
     - id: set-matrix
       run: echo "::set-output name=matrix::$(jq -R -s -c 'split("\n")[:-1]' boards.txt)"
 
-    - name: Add PlatformIO to PATH
-      run: echo "/opt/hostedtoolcache/Python/3.11.4/x64/bin" >> $GITHUB_PATH
+    - name: Find pio path
+      run: echo "$(which pio)" >> $GITHUB_PATH
 
   build:
     needs: prepare
@@ -51,8 +51,7 @@ jobs:
       run: |
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-        sudo apt update
-        sudo apt install gh jq
+        sudo apt install -y gh jq
         echo ${{ secrets.GH_PAT }} | gh auth login --with-token
 
     - name: Build for ${{ matrix.board }}
