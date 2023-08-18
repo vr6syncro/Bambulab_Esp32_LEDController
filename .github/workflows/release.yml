@@ -25,7 +25,10 @@ jobs:
         pip install platformio
 
     - name: Determine PIO path
-      run: echo "PIO_PATH=$(which pio)" >> $GITHUB_ENV
+      id: determine-pio-path
+      run: |
+        echo "PIO_PATH=$(which pio)" >> $GITHUB_ENV
+        echo "::set-output name=pio-path::$(which pio)"
 
     - name: Debug Print PIO path
       run: |
@@ -62,14 +65,14 @@ jobs:
         echo ${{ secrets.GH_PAT }} | gh auth login --with-token
 
     - name: Echo PIO_PATH
-      run: echo $PIO_PATH
+      run: echo ${{ needs.prepare.outputs.pio-path }}
 
     - name: Debug Print current directory
       run: ls -al
 
     - name: Build for ${{ matrix.board }}
       run: |
-        ${{ env.PIO_PATH }} pio run -e ${{ matrix.board }}
+        ${{ needs.prepare.outputs.pio-path }} run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
           mv .pio/build/${{ matrix.board }}/firmware.bin binaries/${{ matrix.board }}/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
