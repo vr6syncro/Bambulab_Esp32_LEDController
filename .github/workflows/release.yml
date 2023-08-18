@@ -25,9 +25,7 @@ jobs:
         pip install platformio
 
     - name: Determine PIO path
-      run: |
-        PIO_DIR=$(pip show platformio | grep Location | awk '{print $2}')
-        echo "PIO_PATH=$PIO_DIR/platformio" >> $GITHUB_ENV
+      run: echo "PIO_PATH=$(which pio)" >> $GITHUB_ENV
 
     - name: Extract Board Names
       run: python extract_boards.py > boards.txt
@@ -56,9 +54,11 @@ jobs:
         sudo apt install -y gh jq
         echo ${{ secrets.GH_PAT }} | gh auth login --with-token
 
+    - name: Echo PIO_PATH
+      run: echo $PIO_PATH
+
     - name: Build for ${{ matrix.board }}
       run: |
-        echo $PIO_PATH
         ${{ env.PIO_PATH }} run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
