@@ -54,7 +54,7 @@ jobs:
 
     - name: Build for ${{ matrix.board }}
       run: |
-        pio run -e ${{ matrix.board }}
+       ~/.local/bin/pio run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
           mv .pio/build/${{ matrix.board }}/firmware.bin binaries/${{ matrix.board }}/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
