@@ -32,8 +32,7 @@ jobs:
           ${{ runner.os }}-pio-
 
     - name: Extract Board Names
-      run: |
-        python extract_boards.py > boards.txt
+      run: python extract_boards.py > boards.txt
 
     - name: Extract Tag Name
       id: get_tag
@@ -49,26 +48,11 @@ jobs:
     - name: Authenticate with GitHub CLI
       run: echo ${{ secrets.GH_PAT }} | gh auth login --with-token
 
-    - name: Build Firmware and Move .bin files
+    - name: Build Firmware
       run: |
         while IFS= read -r board; do
           pio run -e $board
-          mkdir -p binaries/$board
-          mv .pio/build/$board/firmware.bin binaries/$board/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
-          mv .pio/build/$board/bootloader.bin binaries/$board/bootloader.bin
-          mv .pio/build/$board/partitions.bin binaries/$board/partitions.bin
         done < boards.txt
-
-    - name: List files in binaries directory
-      run: find binaries -type f
-
-    - name: Commit and Push binaries to repository
-      run: |
-        git config user.name "GitHub Actions Bot"
-        git config user.email "actions@github.com"
-        git add -f binaries/
-        git commit -m "Add binaries for release ${{ steps.get_tag.outputs.tag }}"
-        git push
 
     - name: Create Release
       id: create_release
@@ -85,9 +69,9 @@ jobs:
     - name: Attach .bin files to Release
       run: |
         while IFS= read -r board; do
-          firmware_file=binaries/$board/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
-          bootloader_file=binaries/$board/bootloader.bin
-          partitions_file=binaries/$board/partitions.bin
+          firmware_file=.pio/build/$board/firmware.bin
+          bootloader_file=.pio/build/$board/bootloader.bin
+          partitions_file=.pio/build/$board/partitions.bin
           
           echo "Uploading $firmware_file to release..."
           if ! gh release upload ${{ steps.get_tag.outputs.tag }} $firmware_file; then
