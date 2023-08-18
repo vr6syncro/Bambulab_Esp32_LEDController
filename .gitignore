@@ -5,3 +5,4 @@
 .vscode/ipch
 build/esp32.esp32.esp32da
 README.md.backup
+/binaries/
