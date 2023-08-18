@@ -27,7 +27,7 @@ jobs:
     - name: Determine PIO path
       run: echo "PIO_PATH=$(which pio)" >> $GITHUB_ENV
 
-    - name: Debug: Print PIO path
+    - name: Debug Print PIO path
       run: |
         echo "Using PIO at: $PIO_PATH"
         which pio
