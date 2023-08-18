@@ -32,7 +32,8 @@ jobs:
           ${{ runner.os }}-pio-
 
     - name: Extract Board Names
-      run: python extract_boards.py > boards.txt
+      run: |
+        python extract_boards.py > boards.txt
 
     - name: Extract Tag Name
       id: get_tag
@@ -48,11 +49,15 @@ jobs:
     - name: Authenticate with GitHub CLI
       run: echo ${{ secrets.GH_PAT }} | gh auth login --with-token
 
-    - name: Build Firmware
+    - name: Build Firmware and Rename .bin files
       run: |
         while IFS= read -r board; do
           pio run -e $board
+          mv .pio/build/$board/firmware.bin .pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
         done < boards.txt
+
+    - name: List renamed .bin files
+      run: ls -l .pio/build/
 
     - name: Create Release
       id: create_release
@@ -69,22 +74,9 @@ jobs:
     - name: Attach .bin files to Release
       run: |
         while IFS= read -r board; do
-          firmware_file=.pio/build/$board/firmware.bin
-          bootloader_file=.pio/build/$board/bootloader.bin
-          partitions_file=.pio/build/$board/partitions.bin
-          
-          echo "Uploading $firmware_file to release..."
-          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $firmware_file; then
-            echo "Failed to upload $firmware_file"
-          fi
-
-          echo "Uploading $bootloader_file to release..."
-          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $bootloader_file; then
-            echo "Failed to upload $bootloader_file"
-          fi
-
-          echo "Uploading $partitions_file to release..."
-          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $partitions_file; then
-            echo "Failed to upload $partitions_file"
+          file=.pio/build/Bambulab_Esp32_LEDController_${board}_${{ steps.get_tag.outputs.tag }}.bin
+          echo "Uploading $file to release..."
+          if ! gh release upload ${{ steps.get_tag.outputs.tag }} $file; then
+            echo "Failed to upload $file"
           fi
         done < boards.txt
