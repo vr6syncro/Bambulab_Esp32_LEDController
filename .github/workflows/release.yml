@@ -72,7 +72,7 @@ jobs:
 
     - name: Build for ${{ matrix.board }}
       run: |
-        ${{ needs.prepare.outputs.pio-path }} run -e ${{ matrix.board }}
+        ${{ needs.prepare.outputs.pio-path }} pio run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
           mv .pio/build/${{ matrix.board }}/firmware.bin binaries/${{ matrix.board }}/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
