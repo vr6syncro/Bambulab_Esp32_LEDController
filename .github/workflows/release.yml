@@ -30,9 +30,8 @@ jobs:
     - id: set-matrix
       run: echo "::set-output name=matrix::$(jq -R -s -c 'split("\n")[:-1]' boards.txt)"
 
-    - name: Find pio path
-      run: which pio || echo "pio not found"
-      id: find-pio
+    - name: Add PlatformIO to PATH
+      run: echo "/opt/hostedtoolcache/Python/3.11.4/x64/bin" >> $GITHUB_PATH
 
   build:
     needs: prepare
@@ -58,7 +57,7 @@ jobs:
 
     - name: Build for ${{ matrix.board }}
       run: |
-        /opt/hostedtoolcache/Python/3.11.4/x64/bin/pio run -e ${{ matrix.board }}
+        pio run -e ${{ matrix.board }}
         mkdir -p binaries/${{ matrix.board }}
         if [[ -f .pio/build/${{ matrix.board }}/firmware.bin ]]; then
           mv .pio/build/${{ matrix.board }}/firmware.bin binaries/${{ matrix.board }}/Bambulab_Esp32_LEDController_${{ matrix.board }}_${{ steps.get_tag.outputs.tag }}.bin
