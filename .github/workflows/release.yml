@@ -64,7 +64,7 @@ jobs:
     - name: Echo PIO_PATH
       run: echo $PIO_PATH
 
-    - name: Debug: Print current directory
+    - name: Debug Print current directory
       run: ls -al
 
     - name: Build for ${{ matrix.board }}
@@ -80,7 +80,7 @@ jobs:
           exit 1
         fi
 
-    - name: Debug: Check binaries directory
+    - name: Debug Check binaries directory
       run: ls -al binaries/${{ matrix.board }}
 
     - name: Push binaries to repository
