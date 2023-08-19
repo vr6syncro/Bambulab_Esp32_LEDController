@@ -1,4 +1,4 @@
-<img src="https://github.com/vr6syncro/vr6syncro/blob/main/img/ak_rund.png?raw=true" alt="Logo" width="200"/>
+<img src="https://github.com/vr6syncro/Bambulab_Esp32_LEDController/blob/main/3D%20Files/Render/Icon.gif" alt="Logo" width="200"/>
 
 # Bambulab Esp32 LEDController #
 
