@@ -1,13 +1,14 @@
+
 #ifndef LEDHANDLE_ICON_CASE_H
 #define LEDHANDLE_ICON_CASE_H
 
 #include <FastLED.h>
 
-
-//Deklariere welche Variablen genutzt werden sollen
+// Deklariere welche Variablen genutzt werden sollen
 extern bool hmsErrorExists;
 extern int printer_stage;
 extern bool f_layerInspection;
+extern String gcodeState;
 
 void ledControlIconFastLED() {
   /*
@@ -15,18 +16,20 @@ void ledControlIconFastLED() {
     Serial.println("Entering Icon Led Handler");
   }
   */
-  if (f_layerInspection && hmsErrorExists) {
+  if (!f_layerInspection && hmsErrorExists) {
+    leds[5] = CRGB::Red;
+  } else if (f_layerInspection && hmsErrorExists) {
     leds[0] = CRGB::Green;
     leds[1] = CRGB::Blue;
     leds[2] = CRGB::Green;
     leds[4] = CRGB::Blue;
-  } else if (!f_layerInspection && hmsErrorExists) {
-    leds[5] = CRGB::Red;
+    leds[5] = CRGB::White;
   } else {
     leds[5] = CRGB::White;
   }
 
-  switch (printer_stage) {
+  if (gcodeState == "IDLE" || gcodeState == "RUNNING") {
+    switch (printer_stage) {
     case -1:
       leds[0] = CRGB::White;
       leds[1] = CRGB::White;
@@ -174,6 +177,26 @@ void ledControlIconFastLED() {
       leds[4] = CRGB::Black;
       leds[5] = CRGB::Black;
       break;
+  }
+  } else if (gcodeState == "PAUSE") {
+      // Insert the LED control code for the PAUSE state here
+      // Example:
+      leds[0] = CRGB::Yellow;
+      leds[1] = CRGB::Yellow;
+      leds[2] = CRGB::Yellow;
+      leds[4] = CRGB::White;
+      leds[5] = CRGB::White;
+  } else if (gcodeState == "FINISH") {
+      // Insert the LED control code for the PAUSE state here
+      // Example:
+      movingRainbowEffectNonBlocking(10);
+  } else {
+      // Insert the LED control code for any other gcodeState values here
+      // Example:
+      leds[0] = CRGB::Purple;
+      leds[1] = CRGB::Purple;
+      leds[2] = CRGB::Purple;
+      leds[4] = CRGB::White;
   }
 
   FastLED.show();

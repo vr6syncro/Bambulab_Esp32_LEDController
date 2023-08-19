@@ -8,23 +8,27 @@
 extern bool hmsErrorExists;
 extern int printer_stage;
 extern bool f_layerInspection;
+extern String gcodeState;
+
 
 void ledControlLogoFastLED() {
   /*
   if (debug) {
-    Serial.println("Entering Logo Led Handler");
+    Serial.println("Entering Icon Led Handler");
   }
   */
-  if (f_layerInspection && hmsErrorExists) {
-    fill_solid(leds, NUM_LEDS, CRGB::Blue);
-  } else if (!f_layerInspection && hmsErrorExists) {
+  if (!f_layerInspection && hmsErrorExists) {
     fill_solid(leds, NUM_LEDS, CRGB::Red);
+  } else if (f_layerInspection && hmsErrorExists) {
+    fill_solid(leds, NUM_LEDS, CRGB::Blue);
   } else {
+    leds[5] = CRGB::White;
   }
 
-  switch (printer_stage) {
+  if (gcodeState == "IDLE" || gcodeState == "RUNNING") {
+    switch (printer_stage) {
     case -1:
-      movingRainbowEffectNonBlocking(10);
+      fadeInFadeOutAllLedsNonBlocking(10, CRGB::Green);
       break;
     case 0:
       fill_solid(leds, NUM_LEDS, CRGB::Green);
@@ -95,6 +99,19 @@ void ledControlLogoFastLED() {
     default:
       fill_solid(leds, NUM_LEDS, CRGB::Black);
       break;
+  }
+  } else if (gcodeState == "PAUSE") {
+      // Insert the LED control code for the PAUSE state here
+      // Example:
+      fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+  } else if (gcodeState == "FINISH") {
+      // Insert the LED control code for the PAUSE state here
+      // Example:
+      movingRainbowEffectNonBlocking(10);
+  } else {
+      // Insert the LED control code for any other gcodeState values here
+      // Example:
+      fill_solid(leds, NUM_LEDS, CRGB::Purple);
   }
 
   FastLED.show();

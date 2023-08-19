@@ -59,6 +59,36 @@ void fadeInFadeOutNonBlocking(int ledIndex, CRGB color, int fadeDelay = 10) {
   }
 }
 
+// sample:     fadeInFadeOutAllLedsNonBlocking(10, CRGB::Red);
+void fadeInFadeOutAllLedsNonBlocking(CRGB color, int fadeDelay = 10) {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis_fade >= fadeDelay) {
+    previousMillis_fade = currentMillis;
+
+    if (isFadingIn) {
+      if (fadeBrightness < brightness) {  // Hier verwenden wir die globale brightness-Variable
+        fadeBrightness++;
+      } else {
+        isFadingIn = false;
+      }
+    } else {
+      if (fadeBrightness > 0) {
+        fadeBrightness--;
+      } else {
+        isFadingIn = true;
+      }
+    }
+
+    for (int i = 0; i < NUM_LEDS; i++) {  // Vorausgesetzt, Sie haben eine Konstante namens NUM_LEDS, die die Anzahl der LEDs angibt.
+      leds[i] = color;
+      leds[i].fadeToBlackBy(map(fadeBrightness, 0, brightness, 255, 0));  // Berücksichtigung der globalen brightness
+    }
+    FastLED.show();
+  }
+}
+
+
 // sample:     movingRainbowEffectNonBlocking(10);
 void movingRainbowEffectNonBlocking(int rainbowDelay = 10) {
   unsigned long currentMillis = millis();
