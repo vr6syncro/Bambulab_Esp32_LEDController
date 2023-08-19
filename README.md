@@ -3,7 +3,7 @@
 # Bambulab Esp32 LEDController #
 
 
-## Getting started - also check the Wiki!
+## Getting started - [also check the Wiki!](https://github.com/vr6syncro/Bambulab_Esp32_LEDController/wiki)
 
 
 [Click here to get to the flasher.](https://vr6syncro.de/programmer/esp32.html "Click here to get to the flasher.")
