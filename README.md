@@ -27,9 +27,11 @@ On the right side of the navigation you get to the configuration.
 
 If the printer is not already connected, it reboots once after saving the data and it should connect to the MQTT.
 
- 
+[The 3D Files are at Printables, click here!](https://www.printables.com/de/model/501355-bambulab-esp32-ledcontroller)
+
+
 ## Hardware Infos
-All ESP32 Wroom Modules should work with WebFlasher.
+For a list of working ESP32 Controllers see [release](https://github.com/vr6syncro/Bambulab_Esp32_LEDController/releases).
     
     Pin 16 is connected with WS2812B Data Pin.
 
