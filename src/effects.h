@@ -106,4 +106,21 @@ void movingRainbowEffectNonBlocking(int rainbowDelay = 10) {
   }
 }
 
+void movingRainbowEffectNonBlockingForThreeLEDs(int rainbowDelay = 10) {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis_rainbow >= rainbowDelay) {
+    previousMillis_rainbow = currentMillis;
+
+    for (int i = 0; i < 3; i++) {  // Nur für LEDs 0, 1 und 2
+      // Der Farbhue wird basierend auf der Position der LED und dem globalen Offset berechnet
+      leds[i] = CHSV((i * 256 / NUM_LEDS) + hueOffset, 255, 255);
+    }
+    FastLED.show();
+
+    hueOffset++;  // Erhöht den Farbhue-Offset, um den Regenbogeneffekt zu verschieben
+  }
+}
+
+
 #endif

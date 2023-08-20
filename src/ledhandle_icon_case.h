@@ -189,7 +189,7 @@ void ledControlIconFastLED() {
   } else if (gcodeState == "FINISH") {
       // Insert the LED control code for the PAUSE state here
       // Example:
-      movingRainbowEffectNonBlocking(10);
+      movingRainbowEffectNonBlockingForThreeLEDs(10);
   } else {
       // Insert the LED control code for any other gcodeState values here
       // Example:
