@@ -16,6 +16,7 @@
 // include the webpages
 #include "startpage.h"
 #include "infopage.h"
+#include "obs.h"
 
 
 
@@ -229,7 +230,10 @@ void setup() {
     request->send(200, "text/html", infopage_html_content);
   });
 
-
+  server.on("/obs", HTTP_GET, [](AsyncWebServerRequest* request) {
+    String obspage_html_content = getOBSPage();
+    request->send(200, "text/html", obspage_html_content);
+  });
 
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest* request) {
     // HTML-Formular für zusätzliche Konfigurationen senden
