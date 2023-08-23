@@ -1,9 +1,9 @@
-<img src="https://github.com/vr6syncro/Bambulab_Esp32_LEDController/blob/main/3D%20Files/Render/Icon.gif" alt="Logo" width="200"/>
+<img src="https://github.com/vr6syncro/Bambulab_Esp32_LEDController/blob/main/3D%20Files/Render/Icon.gif?raw=true" alt="Logo" width="200"/>
 
 # Bambulab Esp32 LEDController #
 
 
-## Getting started - [also check the Wiki!](https://github.com/vr6syncro/Bambulab_Esp32_LEDController/wiki)
+## Quick getting started - [for more details check this WIKI!](https://github.com/vr6syncro/Bambulab_Esp32_LEDController/wiki)
 
 
 [Click here to get to the flasher.](https://vr6syncro.de/programmer/esp32.html "Click here to get to the flasher.")
@@ -34,6 +34,12 @@ If the printer is not already connected, it reboots once after saving the data a
 For a list of working ESP32 Controllers see [release](https://github.com/vr6syncro/Bambulab_Esp32_LEDController/releases).
     
     Pin 16 is connected with WS2812B Data Pin.
+
+
+## OBS Stream Overlay
+Just add your device ip/obs as webpage to OBS. If you want to change something you need to edit the obs file in src directory and self compile.
+
+<img src="https://github.com/vr6syncro/Bambulab_Esp32_LEDController/blob/main/wiki/OBSoverlay.png?raw=true" alt="overlay" width="600"/>
 
 
 ### For more infos and help see my discord at: [http://discord.vr6syncro.de](http://discord.vr6syncro.de)
