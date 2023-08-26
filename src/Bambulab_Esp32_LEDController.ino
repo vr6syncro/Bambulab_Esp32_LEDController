@@ -452,8 +452,8 @@ void loadPreferences() {
   preferences.getString("user", mqtt_user, sizeof(mqtt_user));
   preferences.getString("password", mqtt_password, sizeof(mqtt_password));
   preferences.getString("serial", serial_number, sizeof(serial_number));
-  debug = preferences.getBool("debug");                        // Laden des Debug-Status
-  String szenario_string = preferences.getString("szenario");  // Default to "icon"
+  debug = preferences.getBool("debug");
+  String szenario_string = preferences.getString("szenario");
   szenario = szenario_string.toInt();
   brightness = preferences.getInt("brightness", 84);
   preferences.end();
