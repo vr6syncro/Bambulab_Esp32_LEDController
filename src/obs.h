@@ -172,28 +172,21 @@ socket.onmessage = function(event) {
         document.getElementById('bedTemperature').textContent = data.bedTemperature + '°C';
     }
 
-    if (data.hasOwnProperty('subtask_name')) {
-        if (data.subtask_name.trim() === "") {
-            document.getElementById('subtaskName').textContent = "waiting for print";
-        } else {
-            document.getElementById('subtaskName').textContent = data.subtask_name;
-        }
-    }
-
     if (data.hasOwnProperty('gcodeState')) {
         document.getElementById('gcodeStateID').textContent = data.gcodeState;
     }
 
     if (data.hasOwnProperty('layer_num') && data.hasOwnProperty('total_layer_num')) {
-        let progressPercentage = (data.layer_num / data.total_layer_num) * 100;
+     let progressPercentage = (data.layer_num / data.total_layer_num) * 100;
+     let subtaskName = data.subtask_name.trim() === "" ? "waiting for print" : data.subtask_name;
 
-        if (isNaN(progressPercentage)) {
-            document.getElementById('progressPercentage').textContent = "Start print to view progress";
-        } else {
-            document.getElementById('printProgress').style.width = progressPercentage + "%";
-            document.getElementById('progressPercentage').textContent = "The print is " + progressPercentage.toFixed(2) + "% complete";
-        }
+    if (isNaN(progressPercentage)) {
+        document.getElementById('progressPercentage').textContent = "Start print to view progress";
+    } else {
+        document.getElementById('printProgress').style.width = progressPercentage + "%";
+        document.getElementById('progressPercentage').textContent = `The print ${subtaskName} is ${progressPercentage.toFixed(2)}% complete`;
     }
+}
 };
 
 });
@@ -213,7 +206,6 @@ socket.onmessage = function(event) {
 
         <!-- Rechte Sektion mit den gewünschten Elementen -->
         <div class="right-section">
-            <p class='center-align text-display icon-filename'><strong>File Name</strong> <span id='subtaskName'>Loading...</span></p>
             <p class='center-align text-display icon-status'><strong>Status</strong> <span id='gcodeStateID'>Loading...</span></p>
             <p class='center-align text-display icon-nozzle'><strong>Nozzle Temperature</strong> <span id='nozzleTemperature'>Loading...</span></p>
             <p class='center-align text-display icon-bed'><strong>Bed Temperature</strong> <span id='bedTemperature'>Loading...</span></p>
