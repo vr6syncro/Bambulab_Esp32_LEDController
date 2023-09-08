@@ -22,7 +22,7 @@ void ledControlLogoFastLED() {
   } else if (f_layerInspection && hmsErrorExists) {
     fill_solid(leds, NUM_LEDS, CRGB::Blue);
   } else {
-    leds[5] = CRGB::White;
+
   }
 
   if (gcodeState == "IDLE" || gcodeState == "RUNNING") {
