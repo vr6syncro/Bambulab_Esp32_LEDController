@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-const char* firmwareVersion = "V2.1";
+const char* firmwareVersion = "V3.0";
 
 int szenario = 1;
 bool updateAvailable = false;
@@ -45,5 +45,10 @@ int hms_error_count = 0;            // Variable to keep track of the number of H
 // mqtt not connected
 unsigned long lastAttemptTime = 0;
 const unsigned long RECONNECT_INTERVAL = 5000;  // 5 seconds
+
+// Print finished
+unsigned long finishTime = 0;
+const unsigned long finishDisplayDuration = 180000; //3 minutes
+bool finishProcessed = false;
 
 #endif

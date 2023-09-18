@@ -3,16 +3,18 @@
 
 #include <FastLED.h>
 
+extern int NUM_LEDS;
 
-unsigned long previousMillis_blink = 0;  // Speichert den Zeitpunkt des letzten Blinkens
-bool ledState = false;                   // Zustand der LED: true = eingeschaltet, false = ausgeschaltet
+
+unsigned long previousMillis_blink = 0;
+bool ledState = false;
 
 unsigned long previousMillis_fade = 0;
-uint8_t fadeBrightness = 0;  // Aktuelle Helligkeit der LED für den Fade-Effekt
-bool isFadingIn = true;      // Gibt an, ob die LED gerade heller wird
+uint8_t fadeBrightness = 0;
+bool isFadingIn = true;
 
 unsigned long previousMillis_rainbow = 0;
-uint8_t hueOffset = 0;  // Dieser Wert wird mit der Zeit erhöht, um den Regenbogeneffekt zu verschieben
+uint8_t hueOffset = 0;
 
 // sample:     blinkLEDNonBlocking(4, 1000, CRGB::Red);
 void blinkLEDNonBlocking(int ledIndex, int blinkDelay = 500, CRGB color = CRGB::White) {
@@ -40,7 +42,7 @@ void fadeInFadeOutNonBlocking(int ledIndex, CRGB color, int fadeDelay = 10) {
     previousMillis_fade = currentMillis;
 
     if (isFadingIn) {
-      if (fadeBrightness < brightness) {  // Hier verwenden wir die globale brightness-Variable
+      if (fadeBrightness < brightness) {
         fadeBrightness++;
       } else {
         isFadingIn = false;
@@ -54,7 +56,7 @@ void fadeInFadeOutNonBlocking(int ledIndex, CRGB color, int fadeDelay = 10) {
     }
 
     leds[ledIndex] = color;
-    leds[ledIndex].fadeToBlackBy(map(fadeBrightness, 0, brightness, 255, 0));  // Berücksichtigung der globalen brightness
+    leds[ledIndex].fadeToBlackBy(map(fadeBrightness, 0, brightness, 255, 0));
     FastLED.show();
   }
 }
@@ -67,7 +69,7 @@ void fadeInFadeOutAllLedsNonBlocking(CRGB color, int fadeDelay = 10) {
     previousMillis_fade = currentMillis;
 
     if (isFadingIn) {
-      if (fadeBrightness < brightness) {  // Hier verwenden wir die globale brightness-Variable
+      if (fadeBrightness < brightness) {
         fadeBrightness++;
       } else {
         isFadingIn = false;
@@ -80,9 +82,9 @@ void fadeInFadeOutAllLedsNonBlocking(CRGB color, int fadeDelay = 10) {
       }
     }
 
-    for (int i = 0; i < NUM_LEDS; i++) {  // Vorausgesetzt, Sie haben eine Konstante namens NUM_LEDS, die die Anzahl der LEDs angibt.
+    for (int i = 0; i < NUM_LEDS; i++) {
       leds[i] = color;
-      leds[i].fadeToBlackBy(map(fadeBrightness, 0, brightness, 255, 0));  // Berücksichtigung der globalen brightness
+      leds[i].fadeToBlackBy(map(fadeBrightness, 0, brightness, 255, 0));
     }
     FastLED.show();
   }
@@ -97,12 +99,11 @@ void movingRainbowEffectNonBlocking(int rainbowDelay = 10) {
     previousMillis_rainbow = currentMillis;
 
     for (int i = 0; i < NUM_LEDS; i++) {
-      // Der Farbhue wird basierend auf der Position der LED und dem globalen Offset berechnet
       leds[i] = CHSV((i * 256 / NUM_LEDS) + hueOffset, 255, 255);
     }
     FastLED.show();
 
-    hueOffset++;  // Erhöht den Farbhue-Offset, um den Regenbogeneffekt zu verschieben
+    hueOffset++;
   }
 }
 
@@ -112,13 +113,12 @@ void movingRainbowEffectNonBlockingForThreeLEDs(int rainbowDelay = 10) {
   if (currentMillis - previousMillis_rainbow >= rainbowDelay) {
     previousMillis_rainbow = currentMillis;
 
-    for (int i = 0; i < 3; i++) {  // Nur für LEDs 0, 1 und 2
-      // Der Farbhue wird basierend auf der Position der LED und dem globalen Offset berechnet
+    for (int i = 0; i < 3; i++) {
       leds[i] = CHSV((i * 256 / NUM_LEDS) + hueOffset, 255, 255);
     }
     FastLED.show();
 
-    hueOffset++;  // Erhöht den Farbhue-Offset, um den Regenbogeneffekt zu verschieben
+    hueOffset++;
   }
 }
 

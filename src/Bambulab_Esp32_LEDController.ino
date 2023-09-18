@@ -128,7 +128,7 @@ void sendGcodeCommand(const char* command, const char* param);
 void sendLedControlCommand(const char* ledNode, const char* ledMode, int ledOnTime, int ledOffTime, int loopTimes, int intervalTime);
 
 //save config from web
-void saveConfigFromWeb(const String& server, const String& port, const String& user, const String& password, const String& serial, bool debugValue, int szenarioValue) {
+void saveConfigFromWeb(const String& server, const String& port, const String& user, const String& password, const String& serial, bool debugValue, int szenarioValue, int brightnessValue, int led_scenario_3Value) {
   preferences.begin("mqtt_config", false);
   preferences.putString("server", server.c_str());
   preferences.putString("port", port.c_str());
@@ -136,7 +136,9 @@ void saveConfigFromWeb(const String& server, const String& port, const String& u
   preferences.putString("password", password.c_str());
   preferences.putString("serial", serial.c_str());
   preferences.putBool("debug", debugValue);
+  preferences.putString("brightness", String(brightnessValue).c_str());
   preferences.putString("szenario", String(szenarioValue).c_str());
+  preferences.putString("led_scenario_3", String(led_scenario_3Value).c_str());
   preferences.end();
 }
 
@@ -161,14 +163,11 @@ void setup() {
   Serial.begin(115200);
   client.setBufferSize(20000);
 
+  // Preferences
+  loadPreferences();
 
   initFastLED();
   setFastLedAllBlack();
-
-  //Serial.println("ESP-IDF version is: " + String(esp_get_idf_version()));
-
-  // Preferences
-  loadPreferences();
 
   // WiFiManager
   WiFiManager wifiManager;
@@ -213,12 +212,10 @@ void setup() {
   Serial.println("Initial setup complete.");
   Serial.println("Send 'config' to configure settings via serial console.");
 
-
   setupOTA();
   printWelcomeMessage();
   delay(3000);
   checkForUpdates();
-
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
     String startpage_html_content = getStartPage();
@@ -275,9 +272,11 @@ void setup() {
           String password = doc["password"].as<String>();
           String serial = doc["serial"].as<String>();
           bool debugValue = doc["debug"].as<bool>();
+          int brightnessValue = doc["brightness"].as<int>();
           int szenarioValue = doc["szenario"].as<int>();
+          int led_scenario_3Value = doc["led_scenario_3"].as<int>();
 
-          saveConfigFromWeb(server, port, user, password, serial, debugValue, szenarioValue);
+          saveConfigFromWeb(server, port, user, password, serial, debugValue, szenarioValue, brightnessValue, led_scenario_3Value);
 
           ws.sendTXT(clientNum, "Config saved successfully");
 
@@ -453,9 +452,12 @@ void loadPreferences() {
   preferences.getString("password", mqtt_password, sizeof(mqtt_password));
   preferences.getString("serial", serial_number, sizeof(serial_number));
   debug = preferences.getBool("debug");
-  String szenario_string = preferences.getString("szenario");
+  String szenario_string = preferences.getString("szenario", "1");
   szenario = szenario_string.toInt();
-  brightness = preferences.getInt("brightness", 84);
+  String brightness_string = preferences.getString("brightness", "24");
+  brightness = brightness_string.toInt();
+  String led_scenario_3_string = preferences.getString("led_scenario_3" , "1");
+  led_scenario_3 = led_scenario_3_string.toInt();
   preferences.end();
 }
 
@@ -469,7 +471,6 @@ void savePreferences(WiFiManagerParameter& server, WiFiManagerParameter& port, W
   preferences.putString("serial", serial.getValue());
   preferences.putBool("debug", debug);
   preferences.putString("szenario", szenario_param.getValue());
-  preferences.putInt("brightness", brightness);
   preferences.end();
 }
 
@@ -743,12 +744,13 @@ void configureSerial() {
   Serial.println();
   String szenarioString = askForInput("Szenario - Type 1 for Icon Cover and 2 for Logo Cover", preferences.getString("szenario", ""));
   Serial.println();
+  String led_scenario_3String = askForInput("Number of LEDs for Scenario 3", preferences.getString("led_scenario_3", ""));
+  Serial.println();
 
   Serial.println("-------------------------------------------");
   Serial.println("Debugging Status (on/off)? Current: " + String(debug ? "on" : "off"));
   Serial.println();
-  while (!Serial.available())
-    ;
+  while (!Serial.available());
   String debugStatus = Serial.readStringUntil('\n');
   debugStatus.trim();
   debug = (debugStatus == "on");
@@ -759,16 +761,15 @@ void configureSerial() {
   preferences.putString("password", password);
   preferences.putString("serial", serial);
   preferences.putString("szenario", szenarioString);
+  preferences.putString("led_scenario_3", led_scenario_3String);
   preferences.putBool("debug", debug);
-  preferences.end();
-
+  
   Serial.println("-------------------------------------------");
   Serial.println("Configuration saved. Reboot in 3 seconds.");
   Serial.println("===========================================");
   delay(3000);
   ESP.restart();
 }
-
 
 // config over serial function
 String askForInput(const String& prompt, const String& currentValue) {

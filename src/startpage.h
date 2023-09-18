@@ -9,6 +9,8 @@ extern char mqtt_password[30];
 extern char serial_number[20];
 extern bool debug;
 extern int szenario;
+extern int brightness;
+extern int led_scenario_3;
 extern bool updateAvailable;
 extern String latestVersion;
 
@@ -193,20 +195,47 @@ String getStartPage() {
 <ul id="slide-out" class="sidenav right-aligned">
     <li><h5>Update the Config</h5></li>
     <form id="mqttConfigForm">
-        <li><input type="text" id="server" placeholder="Server" value=")rawliteral"
-                + String(mqtt_server) + R"rawliteral("></li>
-        <li><input type="text" id="port" placeholder="Port" value=")rawliteral"
-                + String(mqtt_port) + R"rawliteral("></li>
-        <li><input type="text" id="user" placeholder="User" value=")rawliteral"
-                + String(mqtt_user) + R"rawliteral("></li>
-        <li><input type="password" id="password" placeholder="Password" value=")rawliteral"
-                + String(mqtt_password) + R"rawliteral("></li>
-        <li><input type="text" id="serial" placeholder="Serial" value=")rawliteral"
-                + String(serial_number) + R"rawliteral("></li>
-        <li><input type="number" id="szenario" placeholder="Szenario" value=")rawliteral"
-                + String(szenario) + R"rawliteral(">
-                <p>Type 1 for Icon Cover and 2 for Logo Cover</p>
-                </li>
+<li>
+  <label for="server">Printer IP</label>
+  <input type="text" id="server" placeholder="IP" value=")rawliteral"
+            + String(mqtt_server) + R"rawliteral(">
+</li>
+<li>
+  <input type="text" id="port" style="display:none;" placeholder="Port" value=")rawliteral"
+            + String(mqtt_port) + R"rawliteral(">
+</li>
+<li>
+  <input type="text" id="user" style="display:none;" placeholder="User" value=")rawliteral"
+            + String(mqtt_user) + R"rawliteral(">
+</li>
+<li>
+  <label for="password">Printer Secret</label>
+  <input type="password" id="password" placeholder="Secret" value=")rawliteral"
+            + String(mqtt_password) + R"rawliteral(">
+</li>
+<li>
+  <label for="erial">Printer Serial</label>
+  <input type="text" id="serial" placeholder="Serial" value=")rawliteral"
+            + String(serial_number) + R"rawliteral(">
+</li>
+<li>
+  <label for="brightness">Set Brightness</label>
+  <input type="number" id="brightness" placeholder="Brightness (0-255)" value=")rawliteral"
+            + String(brightness) + R"rawliteral(" min="0" max="255">
+</li>
+<li>
+  <label>Szenario wählen</label>
+  <select id="szenario" data-selected=")rawliteral" + String(szenario) + R"rawliteral(">
+    <option value="1")rawliteral" + (szenario == 1 ? " selected" : "") + R"rawliteral(">Icon Cover</option>
+    <option value="2")rawliteral" + (szenario == 2 ? " selected" : "") + R"rawliteral(">Logo Cover</option>
+    <option value="3")rawliteral" + (szenario == 3 ? " selected" : "") + R"rawliteral(">Strip Mode</option>
+  </select>
+</li>
+<li id="numLedsContainer" style="display:none;">
+  <p>Number of Leds you use</p>
+  <input type="number" id="led_scenario_3" placeholder="Number of Leds you use" value=")rawliteral"
++ String(led_scenario_3) + R"rawliteral(">
+</li>
         <li>
             <label>
             <input type="hidden" id="debugValue" value=")rawliteral"
@@ -266,15 +295,25 @@ String getStartPage() {
 R"rawliteral(
 </div>
 <script>
+var isSocketOpen = false;  // Zustand der WebSocket-Verbindung
+
+function connectWebSocket() {
   var socket = new WebSocket('ws://' + location.hostname + ':81/ws');
+
   socket.onopen = function(event) {
     console.log("WebSocket connection opened.");
+    isSocketOpen = true;
   };
+
   socket.onerror = function(event) {
     console.error("WebSocket error observed:", event);
+    isSocketOpen = false;
   };
+
   socket.onclose = function(event) {
     console.log("WebSocket connection closed:", event);
+    isSocketOpen = false;
+    setTimeout(connectWebSocket, 5000);  // Versuche, alle 5 Sekunden wiederzuverbinden
   };
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -283,14 +322,51 @@ R"rawliteral(
 
     var modalElems = document.querySelectorAll('.modal');
     M.Modal.init(modalElems);
+
+    var selectElems = document.querySelectorAll('select');
+    M.FormSelect.init(selectElems);
+
+    // Manuelle Aktualisierung des Dropdown-Menüs
+    var szenarioSelect = document.getElementById("szenario");
+    for (var i = 0; i < szenarioSelect.options.length; i++) {
+      if (szenarioSelect.options[i].value === szenarioSelect.getAttribute("data-selected")) {
+        szenarioSelect.options[i].selected = true;
+        break;
+      }
+    }
     
+    // Materialize Dropdown aktualisieren
+    M.FormSelect.init(szenarioSelect);
+    var instance = M.FormSelect.getInstance(szenarioSelect);
+    instance._setValueToInput();
+
     let debugValue = document.getElementById("debugValue").value === "true";
     document.getElementById("debug").checked = debugValue;
+
+    var numLedsContainer = document.getElementById("numLedsContainer");
+
+    function toggleNumLedsInput() {
+      let selectedSzenario = parseInt(document.getElementById("szenario").value, 10);
+      console.log("selectedSzenario:", selectedSzenario);
+      if (selectedSzenario === 3) {
+        numLedsContainer.style.display = "block";
+      } else {
+        numLedsContainer.style.display = "none";
+      }
+    }
+
+    toggleNumLedsInput();
+    document.getElementById("szenario").addEventListener("change", toggleNumLedsInput);
   });
 
   document.getElementById("mqttConfigForm").addEventListener("submit", function(event) {
     event.preventDefault();
-    
+
+    if (!isSocketOpen) {
+      console.error("WebSocket is not open. Cannot send data.");
+      return;
+    }
+
     var formDataConfig = {
         type: "mqttConfig",
         server: document.getElementById("server").value,
@@ -299,24 +375,29 @@ R"rawliteral(
         password: document.getElementById("password").value,
         serial: document.getElementById("serial").value,
         debug: document.getElementById("debug").checked,
-        szenario: document.getElementById("szenario").value
+        szenario: document.getElementById("szenario").value,
+        led_scenario_3: document.getElementById("led_scenario_3").value,
+        brightness: document.getElementById("brightness").value,
     };
-    
+
     socket.send(JSON.stringify(formDataConfig));
-    
+
     var modalInstance = M.Modal.getInstance(document.getElementById('modal'));
     modalInstance.open();
 
     var countdown = 5;
     var countdownInterval = setInterval(function() {
-        countdown--;
-        document.getElementById("countdown").textContent = countdown;
-        if (countdown <= 0) {
-            clearInterval(countdownInterval);
-            location.reload();
-        }
+      countdown--;
+      document.getElementById("countdown").textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+        location.reload();
+      }
     }, 1000);
   });
+}
+
+connectWebSocket();
 </script>
 </body>
 </html>

@@ -6,15 +6,19 @@
 //include ledhandler for different cover
 #include "ledhandle_icon_case.h"
 #include "ledhandle_logo_case.h"
+#include "ledhandle_stripe_case.h"
 
 
-// Function to control LEDs based on the selected scenario - 1 is Icon Cover and 2 is Logo Cover
+// Function to control LEDs based on the selected scenario - 1 is Icon Cover and 2 is Logo Cover and 3 is Strip Mode
 void ledControlSwitch() {
   if (szenario == 1) {
     ledControlIconFastLED();
   } else if (szenario == 2) {
     ledControlLogoFastLED();
+  } else if (szenario == 3) {
+    ledControlStripeFastLED();
   }
+  
 }
 
 //All LED off
@@ -30,6 +34,8 @@ void setWifiConnecting() {
     FastLED.show();
   } else if (szenario == 2) {
     // Handle "logo" scenario
+  } else if (szenario == 3) {
+    // Handle "Strip" scenario
   }
 }
 
@@ -40,6 +46,8 @@ void setMqttConnected() {
     FastLED.show();
   } else if (szenario == 2) {
     // Handle "logo" scenario
+  } else if (szenario == 3) {
+    // Handle "Strip" scenario
   }
 }
 
@@ -55,6 +63,8 @@ void setMqttDisconnected() {
     FastLED.show();
   } else if (szenario == 2) {
     // Handle "logo" scenario
+  } else if (szenario == 3) {
+    // Handle "Strip" scenario
   }
 }
 
